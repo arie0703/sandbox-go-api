@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+  mysql:
+    image: mysql:8.0.27
+    platform: linux/x86_64
+    environment:
+      - MYSQL_USER=sandbox
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=sandbox-go-api
+      - MYSQL_ROOT_PASSWORD=develop
+      - MYSQL_PASSWORD=develop
+    ports:
+      - "3306:3306"
+    networks:
+      - mysql-network
+  mysql-cli:
+    image: mysql:8.0.27
+    platform: linux/x86_64
+    networks:
+      - mysql-network
+    command: mysql -hmysql -usandbox -pdevelop sandbox-go-api
+
+networks:
+  mysql-network:
+    driver: bridge
+
