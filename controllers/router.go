@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"sandbox-go-api/database"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,17 +12,8 @@ func GetRouter() *gin.Engine {
 		})
 	})
 
-	r.GET("user", func(c *gin.Context) {
-		db := database.GetDB()
-
-		var user database.User
-		// SELECT * FROM users ORDER BY id LIMIT 1;
-		db.First(&user)
-
-		c.JSON(200, gin.H{
-			"id":   user.ID,
-			"name": user.Name,
-		})
-	})
+	r.GET("/user", GetAllUser)
+	r.GET("/user/first", GetOneUser)
+	r.POST("/user/create", CreateUser)
 	return r
 }
