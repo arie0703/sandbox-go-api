@@ -5,16 +5,16 @@ import (
 	"time"
 )
 
-type User struct {
+type Snack struct {
 	ID        uint `gorm:"primarykey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Name      string `json:"name"`
 }
 
-func GetAllUser() (datas []User) {
+func GetAllSnack() (datas []Snack) {
 	db := database.GetDB()
-	// SELECT * FROM users ORDER BY id LIMIT 1;
+	// SELECT * FROM Snacks ORDER BY id LIMIT 1;
 	result := db.Find(&datas)
 
 	if result.Error != nil {
@@ -23,7 +23,7 @@ func GetAllUser() (datas []User) {
 	return
 }
 
-func GetOneUser(id int) (data User) {
+func GetOneSnack(id int) (data Snack) {
 	db := database.GetDB()
 	// SELECT * FROM users ORDER BY id LIMIT 1;
 	result := db.First(&data, id)
@@ -34,25 +34,25 @@ func GetOneUser(id int) (data User) {
 	return
 }
 
-func (u *User) CreateUser() {
+func (s *Snack) CreateSnack() {
 	db := database.GetDB()
-	result := db.Create(u)
+	result := db.Create(s)
 	if result.Error != nil {
 		panic(result.Error)
 	}
 }
 
-func (u *User) UpdateUser() {
+func (s *Snack) UpdateSnack() {
 	db := database.GetDB()
-	result := db.Save(u)
+	result := db.Save(s)
 	if result.Error != nil {
 		panic(result.Error)
 	}
 }
 
-func (u *User) DeleteUser() {
+func (s *Snack) DeleteSnack() {
 	db := database.GetDB()
-	result := db.Delete(u)
+	result := db.Delete(s)
 	if result.Error != nil {
 		panic(result.Error)
 	}

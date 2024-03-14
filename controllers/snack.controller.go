@@ -9,15 +9,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetAllUser(c *gin.Context) {
-	users := model.GetAllUser()
+func GetAllSnack(c *gin.Context) {
+	snacks := model.GetAllSnack()
 
 	c.JSON(200, gin.H{
-		"users": users,
+		"snacks": snacks,
 	})
 }
 
-func GetOneUser(c *gin.Context) {
+func GetOneSnack(c *gin.Context) {
 	// パスパラメータからid取得
 	id, _ := strconv.Atoi(c.Param("id"))
 	data := model.GetOneUser(id)
@@ -28,29 +28,29 @@ func GetOneUser(c *gin.Context) {
 	})
 }
 
-func CreateUser(c *gin.Context) {
-	var userJson model.User
-	if err := c.ShouldBindJSON(&userJson); err != nil {
+func CreateSnack(c *gin.Context) {
+	var snackJson model.Snack
+	if err := c.ShouldBindJSON(&snackJson); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	fmt.Println(userJson.Name)
+	fmt.Println(snackJson.Name)
 
-	data := model.User{Name: userJson.Name}
-	data.CreateUser()
+	data := model.Snack{Name: snackJson.Name}
+	data.CreateSnack()
 
 	c.JSON(200, gin.H{
-		"message": "Deleted snack.",
+		"message": "Created snack.",
 		"id":      data.ID,
 		"name":    data.Name,
 	})
 }
 
-func EditUser(c *gin.Context) {
+func EditSnack(c *gin.Context) {
 
 	id, _ := strconv.Atoi(c.Param("id"))
-	data := model.GetOneUser(id)
+	data := model.GetOneSnack(id)
 
 	var snackJson model.Snack
 	if err := c.ShouldBindJSON(&snackJson); err != nil {
@@ -59,20 +59,20 @@ func EditUser(c *gin.Context) {
 	}
 
 	data.Name = snackJson.Name
-	data.UpdateUser()
+	data.UpdateSnack()
 
 	c.JSON(200, gin.H{
-		"message": "Deleted snack.",
+		"message": "Updated snack.",
 		"id":      data.ID,
 		"name":    data.Name,
 	})
 }
 
-func DeleteUser(c *gin.Context) {
+func DeleteSnack(c *gin.Context) {
 
 	id, _ := strconv.Atoi(c.Param("id"))
-	data := model.GetOneUser(id)
-	data.DeleteUser()
+	data := model.GetOneSnack(id)
+	data.DeleteSnack()
 
 	c.JSON(200, gin.H{
 		"message": "Deleted snack.",
