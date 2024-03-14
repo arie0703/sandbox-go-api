@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	model "sandbox-go-api/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetAllUser(c *gin.Context) {
-	users := model.GetAll()
+	users := model.GetAllUser()
 
 	c.JSON(200, gin.H{
 		"users": users,
@@ -17,7 +18,9 @@ func GetAllUser(c *gin.Context) {
 }
 
 func GetOneUser(c *gin.Context) {
-	user := model.GetOne()
+	// パスパラメータからid取得
+	id, _ := strconv.Atoi(c.Param("id"))
+	user := model.GetOneUser(id)
 
 	c.JSON(200, gin.H{
 		"id":   user.ID,
@@ -35,5 +38,29 @@ func CreateUser(c *gin.Context) {
 	fmt.Println(userJson.Name)
 
 	data := model.User{Name: userJson.Name}
-	data.Create()
+	data.CreateUser()
+}
+
+func EditUser(c *gin.Context) {
+
+	id, _ := strconv.Atoi(c.Param("id"))
+	user := model.GetOneUser(id)
+
+	var snackJson model.Snack
+	if err := c.ShouldBindJSON(&snackJson); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user.Name = snackJson.Name
+	user.UpdateUser()
+	fmt.Println("Updated user.", user)
+}
+
+func DeleteUser(c *gin.Context) {
+
+	id, _ := strconv.Atoi(c.Param("id"))
+	user := model.GetOneUser(id)
+	user.DeleteUser()
+	fmt.Println("Deleted user.", user)
 }

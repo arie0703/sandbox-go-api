@@ -11,7 +11,7 @@ type User struct {
 	Name string `json:"name"`
 }
 
-func GetAll() (datas []User) {
+func GetAllUser() (datas []User) {
 	db := database.GetDB()
 	// SELECT * FROM users ORDER BY id LIMIT 1;
 	result := db.Find(&datas)
@@ -22,10 +22,10 @@ func GetAll() (datas []User) {
 	return
 }
 
-func GetOne() (data User) {
+func GetOneUser(id int) (data User) {
 	db := database.GetDB()
 	// SELECT * FROM users ORDER BY id LIMIT 1;
-	result := db.First(&data)
+	result := db.First(&data, id)
 
 	if result.Error != nil {
 		panic(result.Error)
@@ -33,7 +33,7 @@ func GetOne() (data User) {
 	return
 }
 
-func (u *User) Create() {
+func (u *User) CreateUser() {
 	db := database.GetDB()
 	result := db.Create(u)
 	if result.Error != nil {
@@ -41,7 +41,7 @@ func (u *User) Create() {
 	}
 }
 
-func (u *User) Update() {
+func (u *User) UpdateUser() {
 	db := database.GetDB()
 	result := db.Save(u)
 	if result.Error != nil {
@@ -49,7 +49,7 @@ func (u *User) Update() {
 	}
 }
 
-func (u *User) Delete() {
+func (u *User) DeleteUser() {
 	db := database.GetDB()
 	result := db.Delete(u)
 	if result.Error != nil {
