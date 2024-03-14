@@ -5,11 +5,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type User struct {
-	gorm.Model
-	Name string
-}
-
 var (
 	db  *gorm.DB
 	err error
@@ -21,9 +16,6 @@ func Init() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-
-	// Migrate the schema
-	db.AutoMigrate(&User{})
 }
 
 func GetDB() *gorm.DB {
