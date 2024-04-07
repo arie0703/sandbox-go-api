@@ -9,27 +9,61 @@ services:
       dockerfile: ./docker/Dockerfile
     ports:
       - "8080:8080"
-  mysql:
+  mysql-main:
     image: mysql:8.0.27
     platform: linux/x86_64
+    volumes:
+      - ./mysql/main/conf/:/conf
+      - ./mysql/setup.sh:/usr/local/bin/setup.sh
+      - main_log/:/var/log/mysql/
+      - main_db:/var/lib/mysql
     environment:
-      - MYSQL_USER=sandbox
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_USER=main
       - MYSQL_DATABASE=sandbox-go-api
       - MYSQL_ROOT_PASSWORD=develop
       - MYSQL_PASSWORD=develop
+    command: >
+      bash -c " cp /conf/my.cnf /etc/mysql/conf.d/ && chmod 644 /etc/mysql/conf.d/my.cnf && /entrypoint.sh mysqld"
     ports:
       - "3306:3306"
     networks:
       - mysql-network
-  mysql-cli:
+  mysql-replica:
+    image: mysql:8.0.27
+    platform: linux/x86_64
+    volumes:
+      - ./mysql/replica/conf/:/conf
+      - ./mysql/setup.sh:/usr/local/bin/setup.sh
+      - replica_log/:/var/log/mysql/
+      - replica_db:/var/lib/mysql
+    environment:
+      - MYSQL_USER=replica
+      - MYSQL_DATABASE=sandbox-go-api
+      - MYSQL_ROOT_PASSWORD=develop
+      - MYSQL_PASSWORD=develop
+    command: >
+      bash -c " cp /conf/my.cnf /etc/mysql/conf.d/ && chmod 644 /etc/mysql/conf.d/my.cnf && /entrypoint.sh mysqld"
+    networks:
+      - mysql-network
+  mysql-main-cli:
     image: mysql:8.0.27
     platform: linux/x86_64
     networks:
       - mysql-network
-    command: mysql -hmysql -usandbox -pdevelop sandbox-go-api
+    command: mysql -hmysql-main -uroot -pdevelop sandbox-go-api
+  mysql-replica-cli:
+    image: mysql:8.0.27
+    platform: linux/x86_64
+    networks:
+      - mysql-network
+    command: mysql -hmysql-replica -uroot -pdevelop sandbox-go-api
+
+volumes:
+  main_db: {}
+  main_log: {}
+  replica_db: {}
+  replica_log: {}
 
 networks:
   mysql-network:
     driver: bridge
-
