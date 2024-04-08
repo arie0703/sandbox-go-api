@@ -46,7 +46,7 @@ Main環境
 # レプリケーション用ユーザー作成
 CREATE USER 'replica'@'172.30.%.%' IDENTIFIED BY 'replica';
 GRANT REPLICATION SLAVE ON *.* TO 'replica'@'172.30.%.%';
-GRANT ALL PRIVILEDGES ON *.* TO 'replica';
+GRANT ALL PRIVILEGES ON *.* TO 'replica'@'172.30.%.%';
 # バイナリログの情報確認
 SHOW MASTER STATUS;
 
@@ -64,5 +64,8 @@ START SLAVE USER = 'replica' PASSWORD = 'password';
 STOP SLAVE;
 
 SHOW SLAVE STATUS\G;
+
+# レプリケーション設定のリセット
+RESET SLAVE;
 ```
 

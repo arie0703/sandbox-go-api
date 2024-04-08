@@ -14,9 +14,8 @@ services:
     platform: linux/x86_64
     volumes:
       - ./mysql/main/conf/:/conf
-      - ./mysql/setup.sh:/usr/local/bin/setup.sh
-      - main_log/:/var/log/mysql/
-      - main_db:/var/lib/mysql
+      - ./mysql/main/log/:/var/log/mysql/
+      - ./mysql/main/db/:/var/lib/mysql
     environment:
       - MYSQL_USER=main
       - MYSQL_DATABASE=sandbox-go-api
@@ -33,9 +32,8 @@ services:
     platform: linux/x86_64
     volumes:
       - ./mysql/replica/conf/:/conf
-      - ./mysql/setup.sh:/usr/local/bin/setup.sh
-      - replica_log/:/var/log/mysql/
-      - replica_db:/var/lib/mysql
+      - ./mysql/replica/log/:/var/log/mysql/
+      - ./mysql/replica/db/:/var/lib/mysql
     environment:
       - MYSQL_USER=replica
       - MYSQL_DATABASE=sandbox-go-api
