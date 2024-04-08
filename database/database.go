@@ -11,7 +11,7 @@ var (
 )
 
 func Init() {
-	dsn := "sandbox:develop@/sandbox-go-api?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "main:develop@/sandbox-go-api?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
