@@ -13,7 +13,7 @@ services:
     image: mysql:8.0.27
     platform: linux/x86_64
     volumes:
-      - ./mysql/main/conf/:/conf
+      - ./mysql/main/conf/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./mysql/main/log/:/var/log/mysql/
       - ./mysql/main/db/:/var/lib/mysql
     environment:
@@ -21,8 +21,9 @@ services:
       - MYSQL_DATABASE=sandbox-go-api
       - MYSQL_ROOT_PASSWORD=develop
       - MYSQL_PASSWORD=develop
+      - LANG=C.UTF-8
     command: >
-      bash -c " cp /conf/my.cnf /etc/mysql/conf.d/ && chmod 644 /etc/mysql/conf.d/my.cnf && /entrypoint.sh mysqld"
+      bash -c "chmod 644 /etc/mysql/conf.d/my.cnf && /entrypoint.sh mysqld"
     ports:
       - "3306:3306"
     networks:
@@ -31,7 +32,7 @@ services:
     image: mysql:8.0.27
     platform: linux/x86_64
     volumes:
-      - ./mysql/replica/conf/:/conf
+      - ./mysql/replica/conf/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./mysql/replica/log/:/var/log/mysql/
       - ./mysql/replica/db/:/var/lib/mysql
     environment:
@@ -39,8 +40,9 @@ services:
       - MYSQL_DATABASE=sandbox-go-api
       - MYSQL_ROOT_PASSWORD=develop
       - MYSQL_PASSWORD=develop
+      - LANG=C.UTF-8
     command: >
-      bash -c " cp /conf/my.cnf /etc/mysql/conf.d/ && chmod 644 /etc/mysql/conf.d/my.cnf && /entrypoint.sh mysqld"
+      bash -c "chmod 644 /etc/mysql/conf.d/my.cnf && /entrypoint.sh mysqld"
     networks:
       - mysql-network
   mysql-main-cli:
@@ -48,10 +50,14 @@ services:
     platform: linux/x86_64
     networks:
       - mysql-network
+    environment:
+      - LANG=C.UTF-8
     command: mysql -hmysql-main -uroot -pdevelop sandbox-go-api
   mysql-replica-cli:
     image: mysql:8.0.27
     platform: linux/x86_64
+    environment:
+      - LANG=C.UTF-8
     networks:
       - mysql-network
     command: mysql -hmysql-replica -uroot -pdevelop sandbox-go-api
