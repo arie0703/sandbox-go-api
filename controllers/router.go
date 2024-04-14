@@ -18,10 +18,8 @@ func GetRouter() *gin.Engine {
 	r.POST("/user/edit/:id", EditUser)
 	r.POST("/user/delete/:id", DeleteUser)
 
-	r.GET("/snack", GetAllSnack)
-	r.GET("/snack/:id", GetOneSnack)
-	r.POST("/snack/create", CreateSnack)
-	r.POST("/snack/edit/:id", EditSnack)
-	r.POST("/snack/delete/:id", DeleteSnack)
+	r.GET("/recipe", GetAllRecipe)
+	r.GET("/recipe/:id", GetOneRecipe)
+	r.POST("/recipe/create", CreateRecipe)
 	return r
 }
