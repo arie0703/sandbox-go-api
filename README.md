@@ -15,6 +15,13 @@ MySQLを操作
 
 `docker-compose run mysql-cli`
 
+## Add Data (Sample)
+
+```shell
+curl -XPOST localhost:8080/recipe/create -d \
+'{"Recipe": {"Title": "サンプルレシピ", "Description": "サンプル", "UserID": 1}, "Ingredients": [{"Name": "卵", "Amount": 1, "Unit": "個"}], "Procedures": [{ "Description": "hoge", "OrderNumber": 1}] }' | jq .
+```
+
 ### Migration
 
 golang-migrateのインストール(Mac)

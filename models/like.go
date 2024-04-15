@@ -5,16 +5,17 @@ import (
 	"time"
 )
 
-type Snack struct {
+type Like struct {
 	ID        uint `gorm:"primarykey"`
 	CreatedAt time.Time
-	UpdatedAt time.Time
-	Name      string `json:"name"`
+	UserID    uint
+	User      User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	RecipeID  uint
+	Recipe    Recipe `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
-func GetAllSnack() (datas []Snack) {
+func GetAllLike() (datas []Like) {
 	db := database.GetDB()
-	// SELECT * FROM Snacks ORDER BY id LIMIT 1;
 	result := db.Find(&datas)
 
 	if result.Error != nil {
@@ -23,9 +24,8 @@ func GetAllSnack() (datas []Snack) {
 	return
 }
 
-func GetOneSnack(id int) (data Snack) {
+func GetOneLike(id int) (data Like) {
 	db := database.GetDB()
-	// SELECT * FROM users ORDER BY id LIMIT 1;
 	result := db.First(&data, id)
 
 	if result.Error != nil {
@@ -34,25 +34,17 @@ func GetOneSnack(id int) (data Snack) {
 	return
 }
 
-func (s *Snack) CreateSnack() {
+func CreateLike(data *Like) {
 	db := database.GetDB()
-	result := db.Create(s)
+	result := db.Create(data)
 	if result.Error != nil {
 		panic(result.Error)
 	}
 }
 
-func (s *Snack) UpdateSnack() {
+func DeleteLike(data *Like) {
 	db := database.GetDB()
-	result := db.Save(s)
-	if result.Error != nil {
-		panic(result.Error)
-	}
-}
-
-func (s *Snack) DeleteSnack() {
-	db := database.GetDB()
-	result := db.Delete(s)
+	result := db.Delete(data)
 	if result.Error != nil {
 		panic(result.Error)
 	}
