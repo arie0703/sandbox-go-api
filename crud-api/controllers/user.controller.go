@@ -3,7 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
-	model "sandbox-go-api/models"
+	model "sandbox-go-api/crud-api/models"
 	"strconv"
 
 	"github.com/gin-gonic/gin"

@@ -1,22 +1,21 @@
 package model
 
 import (
-	"sandbox-go-api/database"
-	"time"
+	"sandbox-go-api/crud-api/database"
 )
 
-type Recipe struct {
-	ID          uint `gorm:"primarykey"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	Title       string
-	Description string
-	UserID      uint
-	User        User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+type Ingredient struct {
+	ID       uint `gorm:"primarykey"`
+	Name     string
+	Amount   int
+	Unit     string
+	RecipeID uint
+	Recipe   Recipe `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
-func GetAllRecipe() (datas []Recipe) {
+func GetAllIngredient() (datas []Ingredient) {
 	db := database.GetDB()
+	// SELECT * FROM Ingredients ORDER BY id LIMIT 1;
 	result := db.Find(&datas)
 
 	if result.Error != nil {
@@ -25,7 +24,7 @@ func GetAllRecipe() (datas []Recipe) {
 	return
 }
 
-func GetOneRecipe(id int) (data Recipe) {
+func GetOneIngredient(id int) (data Ingredient) {
 	db := database.GetDB()
 	result := db.First(&data, id)
 
@@ -35,7 +34,7 @@ func GetOneRecipe(id int) (data Recipe) {
 	return
 }
 
-func CreateRecipe(data *Recipe) {
+func CreateIngredients(data *[]Ingredient) {
 	db := database.GetDB()
 	result := db.Create(data)
 	if result.Error != nil {
@@ -43,7 +42,7 @@ func CreateRecipe(data *Recipe) {
 	}
 }
 
-func UpdateRecipe(data *Recipe) {
+func UpdateIngredient(data *Ingredient) {
 	db := database.GetDB()
 	result := db.Save(data)
 	if result.Error != nil {
@@ -51,7 +50,7 @@ func UpdateRecipe(data *Recipe) {
 	}
 }
 
-func DeleteRecipe(data *Recipe) {
+func DeleteIngredient(data *Ingredient) {
 	db := database.GetDB()
 	result := db.Delete(data)
 	if result.Error != nil {
