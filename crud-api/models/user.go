@@ -1,7 +1,7 @@
 package model
 
 import (
-	"sandbox-go-api/crud-api/database"
+	"sandbox-go-api/database"
 	"time"
 )
 

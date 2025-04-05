@@ -1,8 +1,8 @@
 package main
 
 import (
-	controller "sandbox-go-api/crud-api/controllers"
-	"sandbox-go-api/crud-api/database"
+	controller "sandbox-go-api/controllers"
+	"sandbox-go-api/database"
 )
 
 func main() {
