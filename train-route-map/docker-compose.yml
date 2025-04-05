@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  neo4j:
+    image: neo4j:latest
+    container_name: neo4j
+    env_file:
+      - .env # .envファイルを読み込む
+    ports:
+      - "7474:7474" # Webインターフェース用
+      - "7687:7687" # Boltプロトコル用
+    volumes:
+      - neo4j-data:/data # データの永続化
+    restart: unless-stopped
+
+volumes:
+  neo4j-data:
+    driver: local
