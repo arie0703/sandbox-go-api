@@ -75,7 +75,7 @@ func saveToken(path string, token *oauth2.Token) {
 	json.NewEncoder(f).Encode(token)
 }
 
-func Run() {
+func Run(year, month int) {
 	ctx := context.Background()
 
 	b, err := os.ReadFile("credentials.json")
@@ -95,19 +95,21 @@ func Run() {
 		log.Fatalf("カレンダーサービスの作成に失敗しました: %v", err)
 	}
 
-	t := time.Now().Format(time.RFC3339)
+	start := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	end := start.AddDate(0, 1, 0)
+
 	events, err := srv.Events.List("primary").
 		ShowDeleted(false).
 		SingleEvents(true).
-		TimeMin(t).
-		MaxResults(10).
+		TimeMin(start.Format(time.RFC3339)).
+		TimeMax(end.Format(time.RFC3339)).
 		OrderBy("startTime").
 		Do()
 	if err != nil {
 		log.Fatalf("予定の取得に失敗しました: %v", err)
 	}
 
-	fmt.Println("直近の予定:")
+	fmt.Printf("%d年%d月の予定:\n", year, month)
 	if len(events.Items) == 0 {
 		fmt.Println("予定はありません。")
 	} else {
