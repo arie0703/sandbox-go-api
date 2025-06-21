@@ -25,3 +25,4 @@ mysql/**/log/*
 mysql/**/db/*
 
 .env
+credentials.json
