@@ -60,9 +60,10 @@ jobs:
     uses: ./.github/workflows/deploy-common.yml
     with:
       environment: ${{ vars.ENVIRONMENT || 'production' }}
-      role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
       aws-region: ${{ vars.AWS_REGION || 'ap-northeast-1' }}
       images: |
         microservice-container: ${{ needs.build-and-push.outputs.image }}
       task-definition-base-path: micro-services/task_definitions/${{ matrix.task }}
       cluster: ${{ vars.ECS_CLUSTER || 'microservice-cluster' }}
+    secrets:
+      AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
