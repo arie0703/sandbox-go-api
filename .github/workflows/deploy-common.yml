@@ -1,0 +1,144 @@
+name: deploy-common
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'The environment name'
+        type: string
+        required: true
+      role-to-assume:
+        description: 'The AWS IAM role to assume'
+        type: string
+        required: true
+      aws-region:
+        description: 'The AWS region to deploy to'
+        type: string
+        required: false
+        default: 'ap-northeast-1'
+      images:
+        description: 'The mapping of container to image-and-tag'
+        type: string
+        required: true
+      task-definition-base-path:
+        description: 'The base path to the task definition files'
+        type: string
+        required: false
+        default: 'task-definition'
+      cluster:
+        description: 'The name of the ECS cluster'
+        type: string
+        required: true
+      service:
+        description: 'The name of the ECS service'
+        type: string
+        required: false
+        default: ''
+    outputs:
+      task-definition-arn:
+        description: 'The ARN of the ECS task definition'
+        value: ${{ jobs.deploy-common.outputs.task-definition-arn }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-common:
+    name: deploy-common
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    outputs:
+      task-definition-arn: ${{ steps.register-task-definition.outputs.task-definition-arn }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ inputs.role-to-assume }}
+          aws-region: ${{ inputs.aws-region }}
+          mask-aws-account-id: false
+
+      - name: Render images
+        id: images
+        env:
+          output_path: ${{ runner.temp }}/images.yaml
+        run: |
+          echo '''
+          ${{ inputs.images }}
+          ''' | yq -r '.' > "$output_path"
+          echo "images=$output_path" >> "$GITHUB_OUTPUT"
+
+      - name: Render container-definitions
+        id: render-container-definitions
+        env:
+          output_path: ${{ runner.temp }}/container-definitions.json
+        run: |
+          cat ${{ inputs.task-definition-base-path }}/${{ inputs.environment }}/container-definitions/*.json | jq -s > "$output_path"
+          echo "container-definitions=$output_path" >> "$GITHUB_OUTPUT"
+      
+      - name: Render task-definition
+        id: render-task-definition
+        env:
+          output_path: ${{ runner.temp }}/task-definition.json
+        run: |
+          jq '.containerDefinitions = input' \
+            ${{ inputs.task-definition-base-path }}/${{ inputs.environment }}/task-definition.json \
+            ${{ steps.render-container-definitions.outputs.container-definitions }} \
+            > "$output_path"
+          echo "task-definition=$output_path" >> "$GITHUB_OUTPUT"
+
+      - name: Get AWS Account ID
+        id: get-account-id
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          echo "account-id=$ACCOUNT_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Replace placeholders in task-definition
+        id: replace-placeholders
+        env:
+          output_path: ${{ runner.temp }}/replace-placeholders.json
+        run: |
+          # Replace ACCOUNT, REGION placeholders in task definition
+          jq --arg account "${{ steps.get-account-id.outputs.account-id }}" \
+             --arg region "${{ inputs.aws-region }}" \
+             'walk(if type == "string" then 
+                gsub("ACCOUNT"; $account) | gsub("REGION"; $region)
+              else . end)' \
+            "${{ steps.render-task-definition.outputs.task-definition }}" > "$output_path"
+          echo "replace-placeholders=$output_path" >> "$GITHUB_OUTPUT"
+
+      - name: Replace image in task-definition
+        id: replace-images
+        env:
+          output_path: ${{ runner.temp }}/replace-images.json
+        run: |
+          input="${{ steps.replace-placeholders.outputs.replace-placeholders }}"
+          output=""
+          for name in $(yq "keys|.[]" "${{ steps.images.outputs.images }}");
+          do
+              image=$(yq ".$name" "${{ steps.images.outputs.images }}")
+              echo "$name to $image"
+              output="${{ runner.temp }}/replace-images-$(uuidgen).json"
+              jq '(.containerDefinitions[]|select(.name==$name)).image|=$image' "$input" \
+                --arg name "$name" --arg image "$image" > "$output"
+              input="$output"
+          done
+          cp "$output" "$output_path"
+          echo "replace-images=$output_path" >> "$GITHUB_OUTPUT"
+
+      - name: Register task definition and Update service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        if: ${{ inputs.service != '' }}
+        with:
+          task-definition: ${{ steps.replace-images.outputs.replace-images }}
+          cluster: ${{ inputs.cluster }}
+          service: ${{ inputs.service }}
+          wait-for-service-stability: true
+
+      - name: Register task definition (not update service)
+        id: register-task-definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        if: ${{ inputs.service == '' }}
+        with:
+          task-definition: ${{ steps.replace-images.outputs.replace-images }}
+          cluster: ${{ inputs.cluster }}

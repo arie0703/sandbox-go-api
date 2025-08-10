@@ -1,0 +1,18 @@
+{
+  "name": "microservice-container",
+  "image": "ACCOUNT.dkr.ecr.REGION.amazonaws.com/microservice:latest",
+  "command": ["task3"],
+  "essential": true,
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "/ecs/microservice",
+      "awslogs-region": "REGION",
+      "awslogs-stream-prefix": "ecs"
+    }
+  },
+  "environment": [],
+  "portMappings": [],
+  "mountPoints": [],
+  "volumesFrom": []
+}

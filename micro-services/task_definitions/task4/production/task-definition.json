@@ -1,0 +1,21 @@
+{
+  "family": "microservice-task4",
+  "taskRoleArn": "arn:aws:iam::ACCOUNT:role/ecsTaskRole",
+  "executionRoleArn": "arn:aws:iam::ACCOUNT:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "volumes": [],
+  "placementConstraints": [],
+  "tags": [
+    {
+      "key": "Service",
+      "value": "microservice"
+    },
+    {
+      "key": "Task",
+      "value": "task4"
+    }
+  ]
+}
