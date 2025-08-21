@@ -6,10 +6,6 @@ on:
         description: 'The environment name'
         type: string
         required: true
-      role-to-assume:
-        description: 'The AWS IAM role to assume'
-        type: string
-        required: true
       aws-region:
         description: 'The AWS region to deploy to'
         type: string
@@ -33,6 +29,10 @@ on:
         type: string
         required: false
         default: ''
+    secrets:
+      AWS_ROLE_TO_ASSUME:
+        description: 'The AWS IAM role to assume'
+        required: true
     outputs:
       task-definition-arn:
         description: 'The ARN of the ECS task definition'
@@ -54,7 +54,7 @@ jobs:
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ inputs.role-to-assume }}
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ inputs.aws-region }}
           mask-aws-account-id: false
 

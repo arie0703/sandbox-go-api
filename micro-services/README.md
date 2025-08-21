@@ -41,6 +41,29 @@ docker run --rm microservice task2
 # ... task7まで
 ```
 
+### Makefileを使用したビルドとプッシュ
+
+```bash
+# 環境変数を設定
+export AWS_ACCOUNT_ID=123456789012
+export AWS_REGION=ap-northeast-1
+
+# ローカルビルドのみ
+make build
+
+# ECRにビルド・プッシュ（完全なワークフロー）
+make build-push
+
+# 個別のコマンド
+make ecr-login    # ECRにログイン
+make tag          # ECR用にタグ付け
+make push         # ECRにプッシュ
+make clean        # ローカルイメージを削除
+
+# ヘルプを表示
+make help
+```
+
 ## デプロイメント設定
 
 ### 必要なGitHub Secrets
